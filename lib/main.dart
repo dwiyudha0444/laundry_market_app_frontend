@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_market_app_frontend/config/app_colors.dart';
+import 'package:laundry_market_app_frontend/pages/auth/register_pages.dart';
 // import 'package:laundry_market_app_frontend/config/app_session.dart';
 
 void main() {
@@ -39,15 +40,7 @@ class MainApp extends StatelessWidget {
           ),
         ),
       ),
-      // home: FutureBuilder(
-      //   future: AppSession.getUser(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.data == null) {
-      //       return const LoginPage();
-      //     }
-      //     return const DashboardPage();
-      //   },
-      // ),
+      home: RegisterPage(),
     );
   }
 }
