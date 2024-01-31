@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_market_app_frontend/config/app_colors.dart';
+import 'package:laundry_market_app_frontend/config/app_session.dart';
 import 'package:laundry_market_app_frontend/pages/auth/login_page.dart';
-import 'package:laundry_market_app_frontend/pages/auth/register_page.dart';
+import 'pages/dashboard_page.dart';
 
 void main() {
-  runApp(ProviderScope(child: const MainApp()));
+  runApp(
+    const ProviderScope(
+      child: MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -41,8 +46,15 @@ class MainApp extends StatelessWidget {
           ),
         ),
       ),
-      // home: RegisterPage(),
-      home: LoginPage(),
+      home: FutureBuilder(
+        future: AppSession.getUser(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            return const LoginPage();
+          }
+          return const DashboardPage();
+        },
+      ),
     );
   }
 }
