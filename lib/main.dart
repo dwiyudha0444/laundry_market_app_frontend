@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_market_app_frontend/config/app_colors.dart';
 import 'package:laundry_market_app_frontend/pages/auth/register_page.dart';
 // import 'package:laundry_market_app_frontend/config/app_session.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(ProviderScope(child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {

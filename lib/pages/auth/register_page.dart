@@ -3,6 +3,7 @@ import 'package:d_info/d_info.dart';
 import 'package:d_input/d_input.dart';
 import 'package:d_view/d_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry_market_app_frontend/config/app_assets.dart';
 import 'package:laundry_market_app_frontend/config/app_colors.dart';
@@ -10,15 +11,16 @@ import 'package:laundry_market_app_frontend/config/app_constants.dart';
 import 'package:laundry_market_app_frontend/config/app_response.dart';
 import 'package:laundry_market_app_frontend/config/failure.dart';
 import 'package:laundry_market_app_frontend/datasource/user_datasource.dart';
+import 'package:laundry_market_app_frontend/providers/register_provider.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final edtUsername = TextEditingController();
   final edtEmail = TextEditingController();
   final edtPassword = TextEditingController();
@@ -27,14 +29,21 @@ class _RegisterPageState extends State<RegisterPage> {
   execute() {
     bool validInput = formKey.currentState!.validate();
     if (!validInput) return;
-    UserDatasource.register(edtUsername.text, edtEmail.text, edtPassword.text)
-        .then((value) {
+
+    setRegisterStatus(ref, 'Loading');
+
+    UserDatasource.register(
+      edtUsername.text,
+      edtEmail.text,
+      edtPassword.text,
+    ).then((value) {
       String newStatus = '';
+
       value.fold(
         (failure) {
           switch (failure.runtimeType) {
             case ServerFailure:
-              newStatus = 'Server Error!';
+              newStatus = 'Server Error';
               DInfo.toastError(newStatus);
               break;
             case NotFoundFailure:
@@ -63,9 +72,11 @@ class _RegisterPageState extends State<RegisterPage> {
               newStatus = failure.message ?? '-';
               break;
           }
+          setRegisterStatus(ref, newStatus);
         },
         (result) {
           DInfo.toastSuccess('Register Success');
+          setRegisterStatus(ref, 'Success');
         },
       );
     });
@@ -103,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 40),
+                  padding: const EdgeInsets.only(top: 30),
                   child: Column(
                     children: [
                       Text(
@@ -121,143 +132,148 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: AppColors.primary.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(30),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
                 Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Material(
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: const Icon(
-                                      Icons.person,
-                                      color: Colors.green,
-                                    ),
-                                  ),
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: Material(
+                                color: Colors.white70,
+                                borderRadius: BorderRadius.circular(10),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.green,
                                 ),
                               ),
-                              DView.spaceWidth(10),
-                              Expanded(
-                                child: DInput(
-                                  controller: edtUsername,
-                                  fillColor: Colors.white70,
-                                  hint: 'Username',
-                                  radius: BorderRadius.circular(10),
-                                ),
-                              )
-                            ],
-                          ),
+                            ),
+                            DView.spaceWidth(10),
+                            Expanded(
+                              child: DInput(
+                                controller: edtUsername,
+                                fillColor: Colors.white70,
+                                hint: 'Username',
+                                radius: BorderRadius.circular(10),
+                                validator: (input) =>
+                                    input == '' ? "Don't empty" : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        DView.spaceHeight(15),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Material(
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: const Icon(
-                                      Icons.email,
-                                      color: Colors.green,
-                                    ),
-                                  ),
+                      ),
+                      DView.spaceHeight(16),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: Material(
+                                color: Colors.white70,
+                                borderRadius: BorderRadius.circular(10),
+                                child: const Icon(
+                                  Icons.email,
+                                  color: Colors.green,
                                 ),
                               ),
-                              DView.spaceWidth(10),
-                              Expanded(
-                                child: DInput(
-                                  controller: edtEmail,
-                                  fillColor: Colors.white70,
-                                  hint: 'Email',
-                                  radius: BorderRadius.circular(10),
-                                ),
-                              )
-                            ],
-                          ),
+                            ),
+                            DView.spaceWidth(10),
+                            Expanded(
+                              child: DInput(
+                                controller: edtEmail,
+                                fillColor: Colors.white70,
+                                hint: 'Email',
+                                radius: BorderRadius.circular(10),
+                                validator: (input) =>
+                                    input == '' ? "Don't empty" : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        DView.spaceHeight(16),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Material(
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: const Icon(
-                                      Icons.key,
-                                      color: Colors.green,
-                                    ),
-                                  ),
+                      ),
+                      DView.spaceHeight(16),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: Material(
+                                color: Colors.white70,
+                                borderRadius: BorderRadius.circular(10),
+                                child: const Icon(
+                                  Icons.key,
+                                  color: Colors.green,
                                 ),
                               ),
-                              DView.spaceWidth(10),
-                              Expanded(
-                                child: DInputPassword(
-                                  controller: edtPassword,
-                                  fillColor: Colors.white70,
-                                  hint: 'Password',
-                                  radius: BorderRadius.circular(10),
-                                ),
-                              )
-                            ],
-                          ),
+                            ),
+                            DView.spaceWidth(10),
+                            Expanded(
+                              child: DInputPassword(
+                                controller: edtPassword,
+                                fillColor: Colors.white70,
+                                hint: 'Password',
+                                radius: BorderRadius.circular(10),
+                                validator: (input) =>
+                                    input == '' ? "Don't empty" : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        DView.spaceHeight(),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 1,
-                                child: DButtonFlat(
-                                  onClick: () {
-                                    Navigator.pop(context);
-                                  },
-                                  padding: const EdgeInsets.all(0),
-                                  radius: 10,
-                                  mainColor: Colors.white70,
-                                  child: const Text(
-                                    'LOG',
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                      ),
+                      DView.spaceHeight(),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: DButtonFlat(
+                                onClick: () {
+                                  Navigator.pop(context);
+                                },
+                                padding: const EdgeInsets.all(0),
+                                radius: 10,
+                                mainColor: Colors.white70,
+                                child: const Text(
+                                  'LOG',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              DView.spaceWidth(10),
-                              Expanded(
-                                child: ElevatedButton(
+                            ),
+                            DView.spaceWidth(10),
+                            Expanded(
+                              child: Consumer(builder: (_, wiRef, __) {
+                                String status =
+                                    wiRef.watch(registerStatusProvider);
+                                if (status == 'Loading') {
+                                  return DView.loadingCircle();
+                                }
+                                return ElevatedButton(
                                   onPressed: () => execute(),
                                   style: const ButtonStyle(
                                     alignment: Alignment.centerLeft,
                                   ),
                                   child: const Text('Register'),
-                                ),
-                              ),
-                            ],
-                          ),
+                                );
+                              }),
+                            ),
+                          ],
                         ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
