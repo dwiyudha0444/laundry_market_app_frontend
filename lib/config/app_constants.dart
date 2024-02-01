@@ -1,5 +1,6 @@
 import 'package:d_view/d_view.dart';
 import 'package:flutter/material.dart';
+import 'package:laundry_market_app_frontend/pages/dashbord_views/account_view.dart';
 
 class AppConstants {
   static const appName = 'Di Laundry';
@@ -35,11 +36,11 @@ class AppConstants {
       'icon': Icons.local_laundry_service,
       'label': 'Laundry',
     },
-    {
-      'view': DView.empty('Account'),
-      'icon': Icons.account_circle,
-      'label': 'Account',
-    },
+    // {
+    //   'view': DView.empty('Account'),
+    //   'icon': Icons.account_circle,
+    //   'label': 'Account',
+    // },
     // {
     //   'view': const HomeView(),
     //   'icon': Icons.home_filled,
@@ -50,11 +51,11 @@ class AppConstants {
     //   'icon': Icons.local_laundry_service,
     //   'label': 'My Laundry',
     // },
-    // {
-    //   'view': const AccountView(),
-    //   'icon': Icons.account_circle,
-    //   'label': 'Account',
-    // },
+    {
+      'view': const AccountView(),
+      'icon': Icons.account_circle,
+      'label': 'Account',
+    },
   ];
 
   static const homeCategories = [
